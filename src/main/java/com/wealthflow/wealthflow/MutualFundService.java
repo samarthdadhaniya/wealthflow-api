@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -26,9 +27,14 @@ public class MutualFundService {
     private final Map<String, CacheEntry<List<Map<String, String>>>> cache = new ConcurrentHashMap<>();
     private static final long CACHE_TTL_HOURS = 12;
 
-    private static final String API_URL = "https://api.kite.trade/mf/instruments";
-    private static final String API_KEY = "o2f0xfrwmuvcmhwg";
-    private static final String ACCESS_TOKEN = "PZA418"; // Replace with valid access token
+    @Value("${kite.api.url}")
+    private String apiUrl;
+    
+    @Value("${kite.api.key}")
+    private String apiKey;
+    
+    @Value("${kite.api.access-token}")
+    private String accessToken;
 
     public Map<String, Object> getPaginatedMutualFundData(int page, int size) {
         List<Map<String, String>> allData = fetchMutualFundData();
@@ -81,11 +87,11 @@ public class MutualFundService {
         // Fetch fresh data from API
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Kite-Version", "3");
-        headers.set("Authorization", "token " + API_KEY + ":" + ACCESS_TOKEN);
+        headers.set("Authorization", "token " + apiKey + ":" + accessToken);
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(API_URL, HttpMethod.GET, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.GET, entity, String.class);
         String csv = response.getBody();
 
         List<Map<String, String>> data = parseCsv(csv);

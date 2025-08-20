@@ -29,6 +29,4 @@ public class MfController {
                     .body("Error fetching or parsing data: " + e.getMessage());
         }
     }
-
-
 }
