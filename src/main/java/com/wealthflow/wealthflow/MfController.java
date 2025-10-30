@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,6 +43,17 @@ public class MfController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error generating AI insights: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/api/mf/instruments/{tradingsymbol}/details")
+    public ResponseEntity<?> getMutualFundDetails(@PathVariable String tradingsymbol) {
+        try {
+            Map<String, Object> fundDetails = mutualFundService.getFundWithAiInsights(tradingsymbol);
+            return ResponseEntity.ok(fundDetails);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error fetching fund details: " + e.getMessage());
         }
     }
 }
